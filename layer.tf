@@ -30,4 +30,6 @@ resource "aws_lambda_layer_version" "lambdaLayer" {
   s3_key = "terraform-lambda/lambda"
   source_code_hash = data.archive_file.lambdaLayer.output_base64sha256
   compatible_runtimes = ["nodejs18.x"]
+
+  depends_on = [ aws_S3_object ]
 }

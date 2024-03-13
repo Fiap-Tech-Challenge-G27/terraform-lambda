@@ -65,8 +65,8 @@ data "archive_file" "authLambdaArtefact" {
 }
 
 resource "aws_lambda_function" "auth_lambda" {
-  function_name = "authLambdaFunction"
-  handler = "index.handler"
+  function_name = "terraform-lambda"
+  handler = "ts.handler"
   role    = aws_iam_role.lambda_execution_role.arn
   runtime = "nodejs18.x"
 

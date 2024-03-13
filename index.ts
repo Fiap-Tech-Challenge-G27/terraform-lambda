@@ -1,6 +1,14 @@
 import { Client } from "pg";
 import { sign } from "jsonwebtoken";
 import { log } from "console";
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from ("@aws-sdk/client-screts-manager");
+
+const clientSecrets = new SecretsManagerClient({
+  region: "us-east-1",
+});
 
 export const handler = async (event: any): Promise<any> => {
   if (!event?.body) {
@@ -43,12 +51,28 @@ export const handler = async (event: any): Promise<any> => {
 };
 
 async function getCustomerByCpf(cpf: string): Promise<any> {
+  const secret_name = "db_credentials";
+
+  let response;
+
+  try {
+    response = await clientSecrets.send(
+      new GetSecretValueCommand({
+        SecretId: secret_name,
+        VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
+      })
+    );
+  } catch (error) {
+
+    throw error;
+  }
+
   const client = new Client({
-    host: process.env.POSTGRES_HOST,
-    port: process.env.POSTGRES_PORT,
-    database: process.env.DATABASE,
-    user: process.env.USER,
-    password: process.env.PASSWORD,
+    host: response.host,
+    port: response.port,
+    database: response.db,
+    user: response.username,
+    password: response.password,
   });
 
   client.connect();
@@ -64,8 +88,24 @@ async function getCustomerByCpf(cpf: string): Promise<any> {
   return user;
 }
 
-function generateJwt(user: any) {
-  const jwtSecret = process.env.JWT_SECRET;
+async function generateJwt(user: any) {
+  const secret_name = "jwt_credentials";
+
+  let response;
+
+  try {
+    response = await clientSecrets.send(
+      new GetSecretValueCommand({
+        SecretId: secret_name,
+        VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
+      })
+    );
+  } catch (error) {
+
+    throw error;
+  }
+
+  const jwtSecret = response.jwtSecret;
 
   console.log("jwtSecret", jwtSecret);
 

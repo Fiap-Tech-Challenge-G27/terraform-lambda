@@ -7,7 +7,19 @@ variable "aws-region" {
 terraform {
   required_version = ">= 1.3, <= 1.7.4"
 
+  backend "s3" {
+    bucket         = "techchallengestate-g27"
+    key            = "terraform-lambda/terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+  }
+
   required_providers {
+    
+    random = {
+      version = "~> 3.0"
+    }
+
     aws = {
       source  = "hashicorp/aws"
       version = "~> 4.65"
@@ -41,6 +53,11 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_secret" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+}
+
 data "archive_file" "authLambdaArtefact" {
     output_path = "files_lambda/authLambdaArtefact.zip"
     type = "zip"
@@ -58,7 +75,24 @@ resource "aws_lambda_function" "auth_lambda" {
 
   environment {
     variables = {
-      COGNITO_USER_POOL_ID = "your-cognito-user-pool-id"
+      POSTGRES_HOST = "your-cognito-user-pool-id"
     }
   }
+}
+
+resource "random_string" "jwtSecret" {
+  length           = 16
+  special          = true
+  override_special = "/@\" "
+}
+
+resource "aws_secretsmanager_secret" "jwt_credentials" {
+  name        = "jwt_credentials"
+}
+
+resource "aws_secretsmanager_secret_version" "jwt_credentials_version" {
+  secret_id     = aws_secretsmanager_secret.jwt_credentials.id
+  secret_string = jsonencode({
+    jwtSecret = random_string.jwtSecret.result
+  })
 }

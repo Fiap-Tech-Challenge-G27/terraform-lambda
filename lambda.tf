@@ -5,7 +5,7 @@ variable "aws-region" {
 }
 
 terraform {
-  required_version = ">= 1.3, <= 1.7.4"
+  required_version = ">= 1.3, <= 1.7.5"
 
   backend "s3" {
     bucket         = "techchallengestate-g27"
@@ -61,12 +61,12 @@ resource "aws_iam_role_policy_attachment" "lambda_secret" {
 data "archive_file" "authLambdaArtefact" {
     output_path = "files_lambda/authLambdaArtefact.zip"
     type = "zip"
-    source_file = "${path.module}/index.ts"
+    source_file = "${path.module}/lambda/index.ts"
 }
 
 resource "aws_lambda_function" "auth_lambda" {
   function_name = "terraform-lambda"
-  handler = "ts.handler"
+  handler = "index.handler"
   role    = aws_iam_role.lambda_execution_role.arn
   runtime = "nodejs18.x"
 

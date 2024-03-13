@@ -11,6 +11,6 @@
       "jsonwebtoken": "^9.0.2",
       "pg": "^8.11.3",
       "typescript": "^5.4.2",
-      "aws-sdk/client-screts-manager": "^3.509.0"
+      "aws-sdk/client-secrets-manager": "^3.509.0"
     }
   }

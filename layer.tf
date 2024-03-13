@@ -1,10 +1,10 @@
 resource "null_resource" "install_layer_deps" {
     triggers = {
-        layer_build = filemd5("${path.module}/layer/package.json")
+        layer_build = filemd5("${path.module}/layer/nodejs/package.json")
     }
 
     provisioner "local-exec" {
-        working_dir = "${path.module}/layer"
+        working_dir = "${path.module}/layer/nodejs"
         command = " npm install --production "
     }
 }
@@ -12,7 +12,7 @@ resource "null_resource" "install_layer_deps" {
 data "archive_file" "lambdaLayer" {
     type = "zip"
     output_path = "files_lambda/lambda-layer.zip"
-    source_dir = "${path.module}/layer"
+    source_dir = "${path.module}/layer/nodejs"
     depends_on = [null_resource.install_layer_deps]
 }
 
@@ -27,7 +27,7 @@ data "archive_file" "lambdaLayer" {
 # }
 
 resource "aws_lambda_layer_version" "lambdaLayer" {
-  layer_name = "lambdaTech"
+  layer_name = "lambdaAuth"
   filename = data.archive_file.lambdaLayer.output_path
   source_code_hash = data.archive_file.lambdaLayer.output_base64sha256
   compatible_runtimes = ["nodejs18.x"]

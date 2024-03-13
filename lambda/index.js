@@ -1,16 +1,13 @@
-import { Client } from "pg";
-import { sign } from "jsonwebtoken";
-import { log } from "console";
-import {
-  SecretsManagerClient,
-  GetSecretValueCommand,
-} from ("@aws-sdk/client-screts-manager");
+const { Client } = require("pg");
+const { sign } = require("jsonwebtoken");
+const { log } = require("console");
+const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
 
 const clientSecrets = new SecretsManagerClient({
   region: "us-east-1",
 });
 
-export const handler = async (event: any): Promise<any> => {
+const handler = async (event) => {
   if (!event?.body) {
     return {
       statusCode: 422,
@@ -36,7 +33,7 @@ export const handler = async (event: any): Promise<any> => {
     };
   }
 
-  const token = generateJwt(user);
+  const token = await generateJwt(user);
 
   return {
     statusCode: 200,
@@ -50,7 +47,7 @@ export const handler = async (event: any): Promise<any> => {
   };
 };
 
-async function getCustomerByCpf(cpf: string): Promise<any> {
+async function getCustomerByCpf(cpf) {
   const secret_name = "db_credentials";
 
   let response;
@@ -63,16 +60,18 @@ async function getCustomerByCpf(cpf: string): Promise<any> {
       })
     );
   } catch (error) {
-
     throw error;
   }
 
+  // Aqui, você precisará ajustar como os dados são acessados no `response`. Este exemplo pode não funcionar como esperado pois depende da estrutura do seu secret.
+  const credentials = JSON.parse(response.SecretString);
+
   const client = new Client({
-    host: response.host,
-    port: response.port,
-    database: response.db,
-    user: response.username,
-    password: response.password,
+    host: credentials.host,
+    port: credentials.port,
+    database: credentials.db,
+    user: credentials.username,
+    password: credentials.password,
   });
 
   client.connect();
@@ -88,7 +87,7 @@ async function getCustomerByCpf(cpf: string): Promise<any> {
   return user;
 }
 
-async function generateJwt(user: any) {
+async function generateJwt(user) {
   const secret_name = "jwt_credentials";
 
   let response;
@@ -101,11 +100,13 @@ async function generateJwt(user: any) {
       })
     );
   } catch (error) {
-
     throw error;
   }
 
-  const jwtSecret = response.jwtSecret;
+  // Aqui, novamente, ajuste conforme a estrutura do seu secret.
+  const credentials = JSON.parse(response.SecretString);
+
+  const jwtSecret = credentials.jwtSecret;
 
   console.log("jwtSecret", jwtSecret);
 
@@ -113,7 +114,7 @@ async function generateJwt(user: any) {
     {
       data: user,
     },
-    String(jwtSecret),
+    jwtSecret,
     { expiresIn: "1h" }
   );
 
@@ -121,3 +122,5 @@ async function generateJwt(user: any) {
 
   return token;
 }
+
+module.exports = { handler };

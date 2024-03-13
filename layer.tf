@@ -5,7 +5,7 @@ resource "null_resource" "install_layer_deps" {
 
     provisioner "local-exec" {
         working_dir = "${path.module}/layer"
-        command = "npm install --production"
+        command = " npm i &&  npm run build && npm prune --production "
     }
 }
 

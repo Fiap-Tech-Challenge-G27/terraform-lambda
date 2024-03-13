@@ -23,7 +23,7 @@ resource "aws_s3_object" "object" {
 
   etag = filemd5(data.archive_file.lambdaLayer.output_path)
 
-  depends_on = [ archive_file.lambdaLayer ]
+  depends_on = [ data.archive_file.lambdaLayer ]
 }
 
 resource "aws_lambda_layer_version" "lambdaLayer" {

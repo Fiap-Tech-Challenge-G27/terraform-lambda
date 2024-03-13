@@ -73,11 +73,13 @@ resource "aws_lambda_function" "auth_lambda" {
   filename         = data.archive_file.authLambdaArtefact.output_path
   source_code_hash = filebase64sha256(data.archive_file.authLambdaArtefact.output_path)
 
-  environment {
-    variables = {
-      POSTGRES_HOST = "your-cognito-user-pool-id"
-    }
-  }
+  layers = [aws_lambda_layer_version.lambdaLayer.arn]
+
+  # environment {
+  #   variables = {
+  #     POSTGRES_HOST = "your-cognito-user-pool-id"
+  #   }
+  # }
 }
 
 resource "random_string" "jwtSecret" {

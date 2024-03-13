@@ -16,9 +16,18 @@ data "archive_file" "lambdaLayer" {
     depends_on = [null_resource.install_layer_deps]
 }
 
+resource "aws_s3_object" "object" {
+  bucket = "techchallengestate-g27"
+  key    = "terraform-lambda/lambda"
+  source = data.archive_file.lambdaLayer.output_path
+
+  etag = filemd5(data.archive_file.lambdaLayer.output_path)
+}
+
 resource "aws_lambda_layer_version" "lambdaLayer" {
   layer_name = "lambdaLayer"
-  filename = data.archive_file.lambdaLayer.output_path
+  s3_bucket = "techchallengestate-g27"
+  s3_key = "terraform-lambda/lambda"
   source_code_hash = data.archive_file.lambdaLayer.output_base64sha256
   compatible_runtimes = ["nodejs18.x"]
 }

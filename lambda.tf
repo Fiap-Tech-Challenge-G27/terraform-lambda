@@ -61,7 +61,7 @@ resource "aws_iam_role_policy_attachment" "lambda_secret" {
 data "archive_file" "authLambdaArtefact" {
     output_path = "files_lambda/authLambdaArtefact.zip"
     type = "zip"
-    source_dir = "${path.module}/lambda"
+    source_file = "${path.module}/lambda/index.ts"
 }
 
 resource "aws_lambda_function" "auth_lambda" {

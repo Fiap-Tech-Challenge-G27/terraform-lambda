@@ -5,7 +5,7 @@ resource "null_resource" "install_layer_deps" {
 
     provisioner "local-exec" {
         working_dir = "${path.module}/layer"
-        command = " npm install --production"
+        command = " npm install --production "
     }
 }
 
@@ -27,7 +27,7 @@ data "archive_file" "lambdaLayer" {
 # }
 
 resource "aws_lambda_layer_version" "lambdaLayer" {
-  layer_name = "lambdaLayer"
+  layer_name = "lambdaTech"
   filename = data.archive_file.lambdaLayer.output_path
   source_code_hash = data.archive_file.lambdaLayer.output_base64sha256
   compatible_runtimes = ["nodejs18.x"]

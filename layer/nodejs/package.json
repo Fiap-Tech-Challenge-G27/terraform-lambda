@@ -1,7 +1,7 @@
 {
   "name": "terraform-lambda",
   "version": "1.0.0",
-  "description": "package para lambda auth",
+  "description": "package para lambda",
   "main": "index.js",
   "scripts": {
     "build": "tsc",

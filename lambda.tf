@@ -78,10 +78,10 @@ resource "aws_lambda_function" "auth_lambda" {
   filename         = data.archive_file.authLambdaArtefact.output_path
   source_code_hash = filebase64sha256(data.archive_file.authLambdaArtefact.output_path)
 
-  vpc_config {
-    subnet_ids = ["subnet-0b298a2372a3b3439"]
-    security_group_ids = ["sg-057fe6da91359a364"]
-  }
+  # vpc_config {
+  #   subnet_ids = ["subnet-0b298a2372a3b3439"]
+  #   security_group_ids = ["sg-057fe6da91359a364"]
+  # }
 
   layers = [aws_lambda_layer_version.lambdaLayerTech.arn]
 
@@ -91,7 +91,7 @@ resource "aws_lambda_function" "auth_lambda" {
   #   }
   # }
 
-  depends_on = [ aws_iam_role_policy_attachment.lambda_basic_execution, aws_iam_role_policy_attachment.lambda_secret,aws_iam_role_policy_attachment.lambda_vpc ]
+  # depends_on = [ aws_iam_role_policy_attachment.lambda_basic_execution, aws_iam_role_policy_attachment.lambda_secret,aws_iam_role_policy_attachment.lambda_vpc ]
 }
 
 resource "random_string" "jwtSecret" {

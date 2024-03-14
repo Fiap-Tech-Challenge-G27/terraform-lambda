@@ -26,7 +26,7 @@ data "archive_file" "lambdaLayer" {
 #   depends_on = [ data.archive_file.lambdaLayer ]
 # }
 
-resource "aws_lambda_layer_version" "lambdaLayer" {
+resource "aws_lambda_layer_version" "lambdaLayerTech" {
   layer_name = "lambdaAuthTech"
   filename = data.archive_file.lambdaLayer.output_path
   source_code_hash = data.archive_file.lambdaLayer.output_base64sha256

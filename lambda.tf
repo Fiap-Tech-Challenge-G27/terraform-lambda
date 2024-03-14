@@ -73,7 +73,7 @@ resource "aws_lambda_function" "auth_lambda" {
   filename         = data.archive_file.authLambdaArtefact.output_path
   source_code_hash = filebase64sha256(data.archive_file.authLambdaArtefact.output_path)
 
-  layers = [aws_lambda_layer_version.lambdaLayer.arn]
+  layers = [aws_lambda_layer_version.lambdaLayerTech.arn]
 
   # environment {
   #   variables = {

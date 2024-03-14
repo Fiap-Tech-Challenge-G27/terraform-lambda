@@ -12,7 +12,7 @@ resource "null_resource" "install_layer_deps" {
 data "archive_file" "lambdaLayer" {
     type = "zip"
     output_path = "files_lambda/lambda-layer.zip"
-    source_dir = "${path.module}/layer/nodejs"
+    source_dir = "${path.module}/layer"
     depends_on = [null_resource.install_layer_deps]
 }
 

@@ -90,6 +90,8 @@ resource "aws_lambda_function" "auth_lambda" {
   #     POSTGRES_HOST = "your-cognito-user-pool-id"
   #   }
   # }
+
+  depends_on = [ aws_iam_role_policy_attachment.lambda_basic_execution, aws_iam_role_policy_attachment.lambda_secret,aws_iam_role_policy_attachment.lambda_vpc ]
 }
 
 resource "random_string" "jwtSecret" {

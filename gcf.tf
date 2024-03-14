@@ -26,34 +26,45 @@ resource "google_project_iam_binding" "gcf_vpc" {
   ]
 }
 
-resource "null_resource" "install_layer_deps" {
-    triggers = {
-        always_run = "${timestamp()}"
-    }
-
-    provisioner "local-exec" {
-        working_dir = "${path.module}/layer/nodejs"
-        command = " npm install --production "
-    }
-}
-
 data "archive_file" "authgcfArtefact" {
   output_path = "files_gcf/authgcfArtefact.zip"
   type        = "zip"
-  source_file = "${path.module}/gcf/index.js"
+  source_dir = "${path.module}/function"
+  # depends_on = [null_resource.install_dependencies]
 }
 
-resource "google_cloudfunctions_function" "auth_gcf" {
-  name        = "terraform-gcf"
-  runtime     = "nodejs18"
-  source_code = data.archive_file.authgcfArtefact.output_path
-  entry_point = "index.handler"
-  project     = var.project_id
-  region      = var.gcp_region
-  trigger_http = true
-  service_account_email = google_service_account.gcf_execution_role.email
+resource "google_storage_bucket" "bucket" {
+  name     = "artifact-bucket"
+  location = var.gcp_region
 }
 
+resource "google_storage_bucket_object" "archive" {
+  name   = "function.zip"
+  bucket = google_storage_bucket.bucket.name
+  source = "files_gcf/authgcfArtefact.zip"
+  depends_on = [archive_file.authgcfArtefact]
+}
+
+resource "google_cloudfunctions_function" "function" {
+  name        = "auth-gcf"
+  runtime     = "nodejs20"
+
+  available_memory_mb   = 128
+  source_archive_bucket = google_storage_bucket.bucket.name
+  source_archive_object = google_storage_bucket_object.archive.name
+  trigger_http          = true
+  entry_point           = "helloGET"
+}
+
+# IAM entry for all users to invoke the function
+resource "google_cloudfunctions_function_iam_member" "invoker" {
+  project        = google_cloudfunctions_function.function.project
+  region         = google_cloudfunctions_function.function.region
+  cloud_function = google_cloudfunctions_function.function.name
+
+  role   = "roles/cloudfunctions.invoker"
+  member = "allUsers"
+}
 resource "random_password" "jwtSecret" {
   length           = 16
   special          = true

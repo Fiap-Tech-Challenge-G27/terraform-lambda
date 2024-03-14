@@ -1,36 +1,3 @@
-variable "aws-region" {
-  type        = string  
-  description = "Região da AWS"
-  default     = "us-east-1"
-}
-
-terraform {
-  required_version = ">= 1.3, <= 1.7.5"
-
-  backend "s3" {
-    bucket         = "techchallengestate-g27"
-    key            = "terraform-lambda/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-  }
-
-  required_providers {
-    
-    random = {
-      version = "~> 3.0"
-    }
-
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.65"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.aws-region
-}
-
 resource "aws_iam_role" "lambda_execution_role" {
   name = "lambda_execution_role"
 

@@ -1,13 +1,4 @@
-resource "null_resource" "install_layer_deps" {
-    triggers = {
-        always_run = "${timestamp()}"
-    }
 
-    provisioner "local-exec" {
-        working_dir = "${path.module}/layer/nodejs"
-        command = " npm install --production "
-    }
-}
 
 data "archive_file" "lambdaLayer" {
     type = "zip"

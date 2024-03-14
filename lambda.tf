@@ -60,7 +60,7 @@ resource "aws_iam_role_policy_attachment" "lambda_secret" {
 
 resource "aws_iam_role_policy_attachment" "lambda_vpc" {
   role       = aws_iam_role.lambda_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSLambdaVPCAccessExecutionRole"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 data "archive_file" "authLambdaArtefact" {

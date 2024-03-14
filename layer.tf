@@ -1,6 +1,6 @@
 resource "null_resource" "install_layer_deps" {
     triggers = {
-        layer_build = filemd5("${path.module}/layer/nodejs/package.json")
+        always_run = "${timestamp()}"
     }
 
     provisioner "local-exec" {

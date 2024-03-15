@@ -8,6 +8,8 @@ const clientSecrets = new SecretsManagerClient({
 });
 
 const handler = async (event) => {
+  console.log(event);
+  
   if (!event?.body) {
     return {
       statusCode: 422,
@@ -24,6 +26,7 @@ const handler = async (event) => {
     };
   }
 
+  console.log("entrou customer")
   const user = await getCustomerByCpf(cpf);
 
   if (!user) {
@@ -32,6 +35,7 @@ const handler = async (event) => {
       body: JSON.stringify({ error: "User not found" }),
     };
   }
+  console.log("gerando jwt")
 
   const token = await generateJwt(user);
 
@@ -62,9 +66,16 @@ async function getCustomerByCpf(cpf) {
   } catch (error) {
     throw error;
   }
+  
+  console.log("pegou secret")
+  console.log(response)
 
   // Aqui, você precisará ajustar como os dados são acessados no `response`. Este exemplo pode não funcionar como esperado pois depende da estrutura do seu secret.
   const credentials = JSON.parse(response.SecretString);
+  
+    console.log("parse de credentials")
+
+  console.log(credentials)
 
   const client = new Client({
     host: credentials.host,
@@ -72,19 +83,33 @@ async function getCustomerByCpf(cpf) {
     database: credentials.db,
     user: credentials.username,
     password: credentials.password,
+    ssl: true
   });
 
   client.connect();
+  
+    console.log("conectando no banco")
 
-  const { rows } = await client.query(
+try {
+    const { rows } = await client.query(
     `SELECT * FROM public."customers" WHERE cpf = '${cpf}'`
   );
 
-  client.end();
 
-  const user = rows[0];
+    console.log(rows)
+
+  client.end();
+    const user = rows[0];
 
   return user;
+  
+} catch (error){
+  throw error;
+}
+
+
+
+
 }
 
 async function generateJwt(user) {

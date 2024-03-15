@@ -94,6 +94,14 @@ resource "aws_lambda_function" "auth_lambda" {
   # depends_on = [ aws_iam_role_policy_attachment.lambda_basic_execution, aws_iam_role_policy_attachment.lambda_secret,aws_iam_role_policy_attachment.lambda_vpc ]
 }
 
+output "lambda_function_name" {
+  value = aws_lambda_function.auth_lambda.function_name
+}
+
+output "lambda_function_invoke_arn" {
+  value = aws_lambda_function.auth_lambda.invoke_arn
+}
+
 resource "random_string" "jwtSecret" {
   length           = 16
   special          = true

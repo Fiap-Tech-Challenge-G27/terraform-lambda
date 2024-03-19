@@ -8,7 +8,6 @@ const clientSecrets = new SecretsManagerClient({
 });
 
 const handler = async (event) => {
-  console.log(event);
   
   if (!event?.body) {
     return {
@@ -26,7 +25,6 @@ const handler = async (event) => {
     };
   }
 
-  console.log("entrou customer")
   const user = await getCustomerByCpf(cpf);
 
   if (!user) {
@@ -35,7 +33,6 @@ const handler = async (event) => {
       body: JSON.stringify({ error: "User not found" }),
     };
   }
-  console.log("gerando jwt")
 
   const token = await generateJwt(user);
 
@@ -52,7 +49,7 @@ const handler = async (event) => {
 };
 
 async function getCustomerByCpf(cpf) {
-  const secret_name = "db_credentials";
+  const secret_name = "dbcredentials";
 
   let response;
 
@@ -60,20 +57,16 @@ async function getCustomerByCpf(cpf) {
     response = await clientSecrets.send(
       new GetSecretValueCommand({
         SecretId: secret_name,
-        VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
+        VersionStage: "AWSCURRENT",
       })
     );
   } catch (error) {
     throw error;
   }
-  
-  console.log("pegou secret")
-  console.log(response)
 
-  // Aqui, você precisará ajustar como os dados são acessados no `response`. Este exemplo pode não funcionar como esperado pois depende da estrutura do seu secret.
+
   const credentials = JSON.parse(response.SecretString);
   
-    console.log("parse de credentials")
 
   console.log(credentials)
 
@@ -87,16 +80,11 @@ async function getCustomerByCpf(cpf) {
   });
 
   client.connect();
-  
-    console.log("conectando no banco")
 
 try {
     const { rows } = await client.query(
     `SELECT * FROM public."customers" WHERE cpf = '${cpf}'`
   );
-
-
-    console.log(rows)
 
   client.end();
     const user = rows[0];
@@ -121,19 +109,17 @@ async function generateJwt(user) {
     response = await clientSecrets.send(
       new GetSecretValueCommand({
         SecretId: secret_name,
-        VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
+        VersionStage: "AWSCURRENT",
       })
     );
   } catch (error) {
     throw error;
   }
 
-  // Aqui, novamente, ajuste conforme a estrutura do seu secret.
+
   const credentials = JSON.parse(response.SecretString);
 
   const jwtSecret = credentials.jwtSecret;
-
-  console.log("jwtSecret", jwtSecret);
 
   let token = sign(
     {

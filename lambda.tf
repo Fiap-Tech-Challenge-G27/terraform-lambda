@@ -102,12 +102,6 @@ output "lambda_function_invoke_arn" {
   value = aws_lambda_function.auth_lambda.invoke_arn
 }
 
-resource "random_string" "jwtSecret" {
-  length           = 16
-  special          = true
-  override_special = "/@\" "
-}
-
 resource "aws_secretsmanager_secret" "jwt_credentials" {
   name        = "jwt_credentials"
 }
@@ -115,6 +109,6 @@ resource "aws_secretsmanager_secret" "jwt_credentials" {
 resource "aws_secretsmanager_secret_version" "jwt_credentials_version" {
   secret_id     = aws_secretsmanager_secret.jwt_credentials.id
   secret_string = jsonencode({
-    jwtSecret = random_string.jwtSecret.result
+    jwtSecret = "secret"
   })
 }

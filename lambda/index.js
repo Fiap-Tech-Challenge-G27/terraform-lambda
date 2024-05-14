@@ -1,4 +1,4 @@
-const { Client } = require("pg");
+const { MongoClient } = require('mongodb');
 const { sign } = require("jsonwebtoken");
 const { log } = require("console");
 const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
@@ -8,7 +8,7 @@ const clientSecrets = new SecretsManagerClient({
 });
 
 const handler = async (event) => {
-  
+
   if (!event?.body) {
     return {
       statusCode: 422,
@@ -66,38 +66,26 @@ async function getCustomerByCpf(cpf) {
 
 
   const credentials = JSON.parse(response.SecretString);
-  
+
 
   console.log(credentials)
 
-  const client = new Client({
-    host: credentials.host,
-    port: credentials.port,
-    database: credentials.db,
-    user: credentials.username,
-    password: credentials.password,
-    ssl: true
-  });
+  const client = new MongoClient(credentials.uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-  client.connect();
+  try {
+    await client.connect();
 
-try {
-    const { rows } = await client.query(
-    `SELECT * FROM public."customers" WHERE cpf = '${cpf}'`
-  );
+    const db = client.db(credentials.db);
+    const collection = db.collection('customers');
+    const user = await collection.findOne({ cpf: cpf });
 
-  client.end();
-    const user = rows[0];
-
-  return user;
-  
-} catch (error){
-  throw error;
-}
-
-
-
-
+    return user;
+    
+  } catch (error) {
+    throw error;
+  } finally {
+    await client.close();
+  }
 }
 
 async function generateJwt(user) {

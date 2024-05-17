@@ -49,7 +49,7 @@ const handler = async (event) => {
 };
 
 async function getCustomerByCpf(cpf) {
-  const secret_name = "dbcredentials";
+  const secret_name = "documentdbcredentials";
 
   let response;
 
@@ -70,7 +70,7 @@ async function getCustomerByCpf(cpf) {
 
   console.log(credentials)
 
-  const client = new MongoClient(credentials.uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  const client = new MongoClient(credentials.url, { useNewUrlParser: true, useUnifiedTopology: true });
 
   try {
     await client.connect();

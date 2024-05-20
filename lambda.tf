@@ -69,6 +69,51 @@ data "archive_file" "authLambdaArtefact" {
     source_file = "${path.module}/lambda/index.js"
 }
 
+resource "aws_default_vpc" "vpcTechChallenge" {
+  tags = {
+    Name = "Default VPC to Tech Challenge"
+  }
+}
+
+resource "aws_default_subnet" "subnetTechChallenge" {
+  availability_zone = "us-east-1a"
+
+  tags = {
+    Name = "Default subnet for us-east-1a to Tech Challenge",
+    "kubernetes.io/role/elb" = "1"
+  }
+}
+
+resource "aws_default_subnet" "subnetTechChallenge2" {
+  availability_zone = "us-east-1b"
+
+  tags = {
+    Name = "Default subnet for us-east-1b to Tech Challenge",
+    "kubernetes.io/role/elb" = "1"
+  }
+}
+
+resource "aws_security_group" "allow_all_ingress" {
+  name        = "allow-all-ingress"
+  description = "Allow all ingress traffic"
+  vpc_id      = aws_default_vpc.vpcTechChallenge.id  # Substitua var.vpc_id pelo ID da sua VPC
+
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Permitindo tráfego de qualquer origem
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Permitindo tráfego para qualquer destino
+  }
+
+}
+
 resource "aws_lambda_function" "auth_lambda" {
   function_name = "terraform-lambda"
   handler = "index.handler"
@@ -79,6 +124,11 @@ resource "aws_lambda_function" "auth_lambda" {
   source_code_hash = filebase64sha256(data.archive_file.authLambdaArtefact.output_path)
 
   layers = [aws_lambda_layer_version.lambdaLayerTech.arn]
+
+  vpc_config {
+    subnet_ids         = [aws_default_subnet.subnetTechChallenge.id, aws_default_subnet.subnetTechChallenge2.id]
+    security_group_ids = [aws_security_group.lambda_sg.id] # Se necessário, substitua lambda_sg pelo ID do seu Security Group
+  }
 
 }
 

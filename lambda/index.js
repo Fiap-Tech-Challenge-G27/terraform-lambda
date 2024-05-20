@@ -4,7 +4,7 @@ const { log } = require("console");
 const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
 
 const clientSecrets = new SecretsManagerClient({
-  region: "us-east-1",
+  region: "us-east-1"
 });
 
 const handler = async (event) => {
@@ -16,7 +16,9 @@ const handler = async (event) => {
     };
   }
 
-  const { cpf } = JSON.parse(event.body);
+  console.log(event);
+  const { cpf } = JSON.parse(event.body)
+  console.log(cpf);
 
   if (!cpf) {
     return {
@@ -52,7 +54,7 @@ async function getCustomerByCpf(cpf) {
   const secret_name = "documentdbcredentials";
 
   let response;
-
+  
   try {
     response = await clientSecrets.send(
       new GetSecretValueCommand({
@@ -64,17 +66,13 @@ async function getCustomerByCpf(cpf) {
     throw error;
   }
 
-
   const credentials = JSON.parse(response.SecretString);
 
 
-  console.log(credentials)
-
-  const client = new MongoClient(credentials.url, { useNewUrlParser: true, useUnifiedTopology: true });
+  const client = new MongoClient(credentials.urlCustomers, { retryWrites: false, useNewUrlParser: true, useUnifiedTopology: true });
 
   try {
     await client.connect();
-
     const db = client.db(credentials.db);
     const collection = db.collection('customers');
     const user = await collection.findOne({ cpf: cpf });

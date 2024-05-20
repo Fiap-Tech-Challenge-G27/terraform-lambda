@@ -98,13 +98,6 @@ resource "aws_security_group" "allow_all_ingress" {
   description = "Allow all ingress traffic"
   vpc_id      = aws_default_vpc.vpcTechChallenge.id  # Substitua var.vpc_id pelo ID da sua VPC
 
-  ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Permitindo tráfego de qualquer origem
-  }
-
   egress {
     from_port   = 0
     to_port     = 65535
@@ -127,7 +120,7 @@ resource "aws_lambda_function" "auth_lambda" {
 
   vpc_config {
     subnet_ids         = [aws_default_subnet.subnetTechChallenge.id, aws_default_subnet.subnetTechChallenge2.id]
-    security_group_ids = [aws_security_group.lambda_sg.id] # Se necessário, substitua lambda_sg pelo ID do seu Security Group
+    security_group_ids = [aws_security_group.allow_all_egress.id] # Se necessário, substitua lambda_sg pelo ID do seu Security Group
   }
 
 }

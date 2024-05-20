@@ -70,7 +70,7 @@ async function getCustomerByCpf(cpf) {
 
   console.log(credentials)
 
-  const client = new MongoClient(credentials.url, { useNewUrlParser: true, useUnifiedTopology: true });
+  const client = new MongoClient(credentials.urlCustomers, { retryWrites: false, useNewUrlParser: true, useUnifiedTopology: true });
 
   try {
     await client.connect();

@@ -16,9 +16,7 @@ const handler = async (event) => {
     };
   }
 
-  console.log(event);
   const { cpf } = JSON.parse(event.body)
-  console.log(cpf);
 
   if (!cpf) {
     return {
@@ -101,7 +99,6 @@ async function generateJwt(user) {
   } catch (error) {
     throw error;
   }
-
 
   const credentials = JSON.parse(response.SecretString);
 

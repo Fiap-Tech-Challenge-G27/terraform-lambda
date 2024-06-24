@@ -135,6 +135,7 @@ output "lambda_function_invoke_arn" {
 
 resource "aws_secretsmanager_secret" "jwt_credentials" {
   name        = "jwt_credentials"
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "jwt_credentials_version" {

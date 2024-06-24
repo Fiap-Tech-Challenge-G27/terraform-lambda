@@ -49,7 +49,7 @@ const handler = async (event) => {
 };
 
 async function getCustomerByCpf(cpf) {
-  const secret_name = "documentdbcredentials";
+  const secret_name = "documentdbcredentialsv2";
 
   let response;
   

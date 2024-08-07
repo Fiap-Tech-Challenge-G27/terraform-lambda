@@ -6,7 +6,6 @@ const clientSecrets = new SecretsManagerClient({
 });
 
 const handler = async (event) => {
-
   if (!event?.body) {
     return {
       statusCode: 422,
@@ -14,16 +13,16 @@ const handler = async (event) => {
     };
   }
 
-  const { cpf } = JSON.parse(event.body);
+  const { cpf, nome, endereco, telefone } = JSON.parse(event.body);
 
-  if (!cpf) {
+  if (!cpf && !nome && !endereco && !telefone) {
     return {
       statusCode: 422,
-      body: JSON.stringify({ error: "Missing cpf" }),
+      body: JSON.stringify({ error: "At least one identifier (cpf, nome, endereco, telefone) must be provided" }),
     };
   }
 
-  const result = await deleteCustomerByCpf(cpf);
+  const result = await deleteCustomer({ cpf, nome, endereco, telefone });
 
   if (!result.deletedCount) {
     return {
@@ -34,11 +33,11 @@ const handler = async (event) => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: "User successfully deleted" }),
+    body: JSON.stringify({ message: "User successfully deleted", data: result.deletedData }),
   };
 };
 
-async function deleteCustomerByCpf(cpf) {
+async function deleteCustomer(query) {
   const secret_name = "documentdbcredentialsv2";
 
   let response;
@@ -62,9 +61,15 @@ async function deleteCustomerByCpf(cpf) {
     await client.connect();
     const db = client.db(credentials.db);
     const collection = db.collection('customers');
-    const result = await collection.deleteOne({ cpf: cpf });
+    
+    const deletedData = await collection.findOne(query);
+    if (!deletedData) {
+      return { deletedCount: 0 };
+    }
+    
+    const result = await collection.deleteOne(query);
 
-    return result;
+    return { deletedCount: result.deletedCount, deletedData: deletedData };
     
   } catch (error) {
     throw error;

@@ -66,7 +66,13 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc" {
 data "archive_file" "authLambdaArtefact" {
     output_path = "files_lambda/authLambdaArtefact.zip"
     type = "zip"
-    source_file = "${path.module}/lambda/index.js"
+    source_file = "${path.module}/lambda-auth/index.js"
+}
+
+data "archive_file" "deleteLambdaArtefact" {
+    output_path = "files_lambda/deleteLambdaArtefact.zip"
+    type = "zip"
+    source_file = "${path.module}/lambda-delete/exclusao.js"
 }
 
 resource "aws_default_vpc" "vpcTechChallenge" {
@@ -116,7 +122,7 @@ resource "aws_lambda_function" "auth_lambda" {
   filename         = data.archive_file.authLambdaArtefact.output_path
   source_code_hash = filebase64sha256(data.archive_file.authLambdaArtefact.output_path)
 
-  layers = [aws_lambda_layer_version.lambdaLayerTech.arn]
+  layers = [aws_lambda_layer_version.lambdaLayerAuth.arn]
 
   vpc_config {
     subnet_ids         = [aws_default_subnet.subnetTechChallenge.id, aws_default_subnet.subnetTechChallenge2.id]
@@ -125,12 +131,38 @@ resource "aws_lambda_function" "auth_lambda" {
 
 }
 
-output "lambda_function_name" {
+resource "aws_lambda_function" "delete_lambda" {
+  function_name = "terraform-lambda-delete"
+  handler = "exclusao.handler"
+  role    = aws_iam_role.lambda_execution_role.arn
+  runtime = "nodejs18.x"
+
+  filename         = data.archive_file.deleteLambdaArtefact.output_path
+  source_code_hash = filebase64sha256(data.archive_file.deleteLambdaArtefact.output_path)
+
+  layers = [aws_lambda_layer_version.lambdaLayerDelete.arn]
+
+  vpc_config {
+    subnet_ids         = [aws_default_subnet.subnetTechChallenge.id, aws_default_subnet.subnetTechChallenge2.id]
+    security_group_ids = [aws_security_group.allow_all_egress.id] # Se necessário, substitua lambda_sg pelo ID do seu Security Group
+  }
+
+}
+
+output "authlambda_function_name" {
   value = aws_lambda_function.auth_lambda.function_name
 }
 
-output "lambda_function_invoke_arn" {
+output "authlambda_function_invoke_arn" {
   value = aws_lambda_function.auth_lambda.invoke_arn
+}
+
+output "deletelambda_function_name" {
+  value = aws_lambda_function.delete_lambda.function_name
+}
+
+output "deletelambda_function_invoke_arn" {
+  value = aws_lambda_function.delete_lambda.invoke_arn
 }
 
 resource "aws_secretsmanager_secret" "jwt_credentials" {

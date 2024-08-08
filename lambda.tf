@@ -100,8 +100,8 @@ resource "aws_default_subnet" "subnetTechChallenge2" {
 }
 
 resource "aws_security_group" "allow_all_egress" {
-  name        = "allow-all-ingress"
-  description = "Allow all ingress traffic"
+  name        = "allow-all-egress"
+  description = "Allow all egress traffic"
   vpc_id      = aws_default_vpc.vpcTechChallenge.id  # Substitua var.vpc_id pelo ID da sua VPC
 
   egress {

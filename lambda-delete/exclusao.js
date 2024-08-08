@@ -1,11 +1,11 @@
-import { MongoClient } from 'mongodb';
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+const { MongoClient } = require('mongodb');
+const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
 
 const clientSecrets = new SecretsManagerClient({
   region: "us-east-1"
 });
 
-const handler = async (event) => {
+exports.handler = async (event) => {
   if (!event?.body) {
     return {
       statusCode: 422,
@@ -77,5 +77,3 @@ async function deleteCustomer(query) {
     await client.close();
   }
 }
-
-module.exports = { handler };

@@ -66,13 +66,13 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc" {
 data "archive_file" "authLambdaArtefact" {
     output_path = "files_lambda/authLambdaArtefact.zip"
     type = "zip"
-    source_file = "${path.module}/lambda-auth/index.js"
+    source_dir = "${path.module}/lambda-auth"
 }
 
 data "archive_file" "deleteLambdaArtefact" {
     output_path = "files_lambda/deleteLambdaArtefact.zip"
     type = "zip"
-    source_file = "${path.module}/lambda-delete/exclusao.js"
+    source_dir = "${path.module}/lambda-delete"
 }
 
 resource "aws_default_vpc" "vpcTechChallenge" {

@@ -85,7 +85,7 @@ async function getCustomerByCpf(cpf) {
 }
 
 async function generateJwt(user) {
-  const secret_name = "jwt_credentials";
+  const secret_name = "jwt_credentialsv3";
 
   let response;
 

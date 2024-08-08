@@ -1,7 +1,7 @@
-const { MongoClient } = require('mongodb');
-const { sign } = require("jsonwebtoken");
-const { log } = require("console");
-const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
+import { sign } from 'jsonwebtoken';
+import { MongoClient } from 'mongodb';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+
 
 const clientSecrets = new SecretsManagerClient({
   region: "us-east-1"

@@ -5,7 +5,7 @@ const clientSecrets = new SecretsManagerClient({
   region: "us-east-1"
 });
 
-const handler = async (event) => {
+exports.handler = async (event) => {
   if (!event?.body) {
     return {
       statusCode: 422,

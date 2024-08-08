@@ -122,8 +122,6 @@ resource "aws_lambda_function" "auth_lambda" {
   filename         = data.archive_file.authLambdaArtefact.output_path
   source_code_hash = filebase64sha256(data.archive_file.authLambdaArtefact.output_path)
 
-  layers = [aws_lambda_layer_version.lambdaLayerAuth.arn]
-
   vpc_config {
     subnet_ids         = [aws_default_subnet.subnetTechChallenge.id, aws_default_subnet.subnetTechChallenge2.id]
     security_group_ids = [aws_security_group.allow_all_egress.id] # Se necessário, substitua lambda_sg pelo ID do seu Security Group
@@ -139,8 +137,6 @@ resource "aws_lambda_function" "delete_lambda" {
 
   filename         = data.archive_file.deleteLambdaArtefact.output_path
   source_code_hash = filebase64sha256(data.archive_file.deleteLambdaArtefact.output_path)
-
-  layers = [aws_lambda_layer_version.lambdaLayerDelete.arn]
 
   vpc_config {
     subnet_ids         = [aws_default_subnet.subnetTechChallenge.id, aws_default_subnet.subnetTechChallenge2.id]

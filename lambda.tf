@@ -165,13 +165,13 @@ output "deletelambda_function_invoke_arn" {
   value = aws_lambda_function.delete_lambda.invoke_arn
 }
 
-resource "aws_secretsmanager_secret" "jwt_credentials" {
+resource "aws_secretsmanager_secret" "jwt_credentialsv3" {
   name        = "jwt_credentialsv3"
   recovery_window_in_days = 0
 }
 
-resource "aws_secretsmanager_secret_version" "jwt_credentials_version" {
-  secret_id     = aws_secretsmanager_secret.jwt_credentials.id
+resource "aws_secretsmanager_secret_version" "jwt_credentials_version3" {
+  secret_id     = aws_secretsmanager_secret.jwt_credentialsv3.id
   secret_string = jsonencode({
     jwtSecret = "secret"
   })

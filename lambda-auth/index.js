@@ -111,7 +111,7 @@ async function generateJwt(user) {
     { expiresIn: "1h" }
   );
 
-  log("token", token);
+  console.log("token", token);
 
   return token;
 }

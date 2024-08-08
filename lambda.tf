@@ -166,7 +166,7 @@ output "deletelambda_function_invoke_arn" {
 }
 
 resource "aws_secretsmanager_secret" "jwt_credentials" {
-  name        = "jwt_credentials"
+  name        = "jwt_credentialsv3"
   recovery_window_in_days = 0
 }
 
